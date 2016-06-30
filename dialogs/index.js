@@ -1,14 +1,14 @@
 var builder = require('botbuilder');
 
-var model = process.env.model || 'https://api.projectoxford.ai/luis/v1/application?id=a19fd36f-ec91-4e0d-9a28-492cf56936e4&subscription-key=c44b73c3cbcd4060b7be0844b4044f6d&q=';
+var model = process.env.model || 'https://api.projectoxford.ai/luis/v1/application?id=28bafb7d-f89e-49dc-8fda-498d0c20ce5a&subscription-key=7992140f378349d5be19042f01bc09f3&q=';
 var dialog = new builder.LuisDialog(model);
 module.exports = dialog;
 
-dialog.onDefault(builder.DialogAction.send("I'm sorry I didn't understand."));
+dialog.onDefault(builder.DialogAction.send("Moi pas comprendre toi !"));
 
 /** Prompts a user for the title of the task and saves it.  */
 dialog.on('Welcome', [
     function (session, args, next) {
-        builder.Prompts.text(session, "Bonjour mec !");
+        builder.Prompts.text(session, "Bien le bonjour de la part de Couch Potatoes Chat Bot !");
     }
 ]);
