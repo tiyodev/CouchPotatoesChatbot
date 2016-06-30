@@ -8,7 +8,7 @@ dialog.onDefault(builder.DialogAction.send("Moi pas comprendre toi !"));
 
 /** Prompts a user for the title of the task and saves it.  */
 dialog.on('Welcome', [
-    function (session, args, next) {
-        builder.Prompts.text(session, "Bien le bonjour de la part de Couch Potatoes Chat Bot !");
+    function (session, args) {
+        session.send("Bien le bonjour de la part de Couch Potatoes Chat Bot !");
     }
 ]);
