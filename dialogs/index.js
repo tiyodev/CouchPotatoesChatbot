@@ -1,7 +1,7 @@
 var builder = require('botbuilder');
 var message = require('./message');
 
-var model = process.env.model || 'https://api.projectoxford.ai/luis/v1/application?id=ce9081fa-e36d-44cb-a510-76bcb9035bd7&subscription-key=c44b73c3cbcd4060b7be0844b4044f6d&q=';
+var model = process.env.model || 'https://api.projectoxford.ai/luis/v1/application?id=a19fd36f-ec91-4e0d-9a28-492cf56936e4&subscription-key=c44b73c3cbcd4060b7be0844b4044f6d&q=';
 var dialog = new builder.LuisDialog(model);
 module.exports = dialog;
 
@@ -24,7 +24,6 @@ dialog.on('Search', [
             typeOfContent: typeOfContent ? typeOfContent.entity : null,
             moment: moment ? moment.entity : null  
         };
-
         // Si le type de contenu n'est pas présent, demander une précision à l'utilisateur
         if(!typeOfContent){
             builder.Prompts.text(session, message.typeOfContent);
@@ -41,16 +40,19 @@ dialog.on('Search', [
 
         // Si le moment n'est pas présent, demander une précision à l'utilisateur
         if (search.typeOfContent && !search.moment) {
-            builder.Prompts.time(session, message.moment);
+            builder.Prompts.text(session, message.moment);
         } else {
             next();
         }
     },
     function (session, results) {
         var search = session.dialogData.search;
+        console.log(results);
         if (results.response) {
-            var time = builder.EntityRecognizer.resolveTime([results.response]);
-            search.moment = time ? time : null;
+            //var moment = builder.EntityRecognizer.findEntity(results.response, 'Moment');
+            //console.log(moment);
+            //search.moment = moment ? moment.entity : null;
+            search.moment = results.response;
         }
 
         session.send(message.searchResume, search.typeOfContent, search.moment);
