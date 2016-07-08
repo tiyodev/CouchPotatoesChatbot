@@ -1,6 +1,6 @@
 module.exports = {
-    welcomeMsg : 'Bonjour %s, je suis le Bot Couch Potatoes. Si tu recherches une émission passée ou a venir : je peux t\'aider.',
-    typeOfContent : 'Quel type de contenu veux tu regarder ?',
-    moment : 'A quel moment veux tu regarder ton contenu ?',
-    searchResume : 'Patiente un petit peu, je recherche %s pour %s.'
+    welcomeMsg : 'Bonjour %s, je suis le chatbot Couch Potatoes ! Que puis-je faire pour toi ?,
+    typeOfContent : 'Que veux-tu regarder ?',
+    moment : 'A quel moment veux tu le regarder ?',
+    searchResume : 'Une petite seconde, je recherche %s pour %s.'
 }
