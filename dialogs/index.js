@@ -4,20 +4,37 @@ var http = require('http');
 var request = require('request');
 var moment = require('moment');
 
-var model = process.env.model || 'https://api.projectoxford.ai/luis/v1/application?id=a19fd36f-ec91-4e0d-9a28-492cf56936e4&subscription-key=c44b73c3cbcd4060b7be0844b4044f6d&q=';
+
+var model = process.env.model || 'https://api.projectoxford.ai/luis/v1/application?id=ce9081fa-e36d-44cb-a510-76bcb9035bd7&subscription-key=c44b73c3cbcd4060b7be0844b4044f6d&q=';
+//var model = process.env.model || 'https://api.projectoxford.ai/luis/v1/application?id=a19fd36f-ec91-4e0d-9a28-492cf56936e4&subscription-key=c44b73c3cbcd4060b7be0844b4044f6d&q=';
 //var model = process.env.model || 'https://api.projectoxford.ai/luis/v1/application?id=5d6ff76e-8dbe-466c-9daf-493701814eef&subscription-key=7992140f378349d5be19042f01bc09f3&q='
 var recognizer = new builder.LuisRecognizer(model);
 var dialog = new builder.IntentDialog({ recognizers: [recognizer] });
 
 module.exports = dialog;
 
-//dialog.onDefault(
-   // console.log(new Date(Date.UTC(16, 08, 22, 0, 0, 0)))
-//);
 
 dialog.matches('Welcome', [
     function (session, args) {
        session.send(message.welcomeMsg, session.message.address.user.name);
+    }
+]);
+
+dialog.matches('Favoris', [
+    function (session, args) {
+       session.send("C’est fait. Des membres du Club ayant les mêmes goûts que vous ont recommandé ce reportage sur Nestlé et sa politique de l’eau : http://www.arte.tv/guide/fr/041127-000-A/nestle-et-le-business-de-l-eau-en-bouteille");
+    }
+]);
+
+dialog.matches('ArteClub', [
+    function (session, args) {
+       session.send("Arte Club, c’est gratuit et c’est le meilleur d’Arte pour vous ! Il suffit de cliquer ici pour tout savoir : https://club.arte.tv");
+    }
+]);
+
+dialog.matches('EasterEgg', [
+    function (session, args) {
+       session.send("Héhéhé ! Voici un article qui résume bien l’état actuel des choses : http://info.arte.tv/fr/france-allemagne-un-nouveau-coup-de-rhin");
     }
 ]);
 
@@ -54,7 +71,7 @@ dialog.matches('Search', [
         }
     },
     function (session, results) {
-      /*  console.log("Data : ");
+        /*console.log("Data : ");
         console.log(session.dialogData);
         console.log("\n\n"); */
         var search = session.dialogData.search;
@@ -66,11 +83,30 @@ dialog.matches('Search', [
         console.log(search);
         console.log("\n\n");*/
 
+        // Récupération du code du type de contenu (Temporaire)
+        var contentType = '';
+        if(search.typeOfContent == 'série' || search.typeOfContent == 'séries')
+        {
+            contentType = 'FIC';
+        }
+        else if(search.typeOfContent == 'documentaire' || search.typeOfContent == 'documentaires')
+        {
+            contentType = 'DEC';
+        }
+        else if(search.typeOfContent == 'cinéma' || search.typeOfContent == 'film' || search.typeOfContent == 'films')
+        {
+            contentType = 'CIN';
+        }
+
         var dateRequest = moment();
 
         if(search.moment = "demain")
         {
             dateRequest = dateRequest.add(1, 'days');
+        }
+        else if(search.moment = "cette semaine")
+        {
+            dateRequest = dateRequest.add(2, 'days');
         }
 
         session.send(message.searchResume, search.typeOfContent, search.moment);
@@ -84,9 +120,14 @@ dialog.matches('Search', [
              qs: {
                  'channel' : 'FR',
                  'arteSchedulingDay' : dateRequest.toISOString().substring(0, 11),
-                 'limit' : '3'
+                 'limit' : '1',
+                 'program.categories.code' : contentType
              }
          };
+
+         console.log("----- Search ----")
+         console.log(dateRequest.toISOString().substring(0, 11));
+         console.log(contentType);
 
         request(options, function (error, response, body) {
               if (!error && response.statusCode == 200) {
@@ -108,7 +149,11 @@ dialog.matches('Search', [
               }
               else
               {
-                  session.send("Erreur durant la recherche !");
+                  var data = JSON.parse(body);
+
+                  console.log(data.errors[0].detail);
+
+                  session.send(data.errors[0].detail);
               }
           })
     }
